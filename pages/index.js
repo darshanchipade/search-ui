@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import ChatScreen from '../components/ChatScreen';
+import ChatScreen from '@/components/ChatScreen';
 
 export default function Home() {
   const [query, setQuery] = useState('');
