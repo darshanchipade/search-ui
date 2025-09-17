@@ -1,28 +1,26 @@
+// pages/SearchContainer.js
 import React, { useState } from 'react';
 
-const SearchContainer = ({ onSearch }) => {
-    const [query, setQuery] = useState('');
+export default function SearchContainer({ onSearch, isSearching = false }) {
+  const [local, setLocal] = useState('');
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        onSearch(query);
-    };
+  const submit = (e) => {
+    e.preventDefault();
+    onSearch?.(local); // index.js will set page=1 on new search
+  };
 
-    return (
-        <div>
-            <h1>What are you looking for?</h1>
-            <form onSubmit={handleSearch}>
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="e.g., Apple Financing"
-                    style={{ width: '300px', padding: '10px', marginRight: '10px' }}
-                />
-                <button type="submit">Search</button>
-            </form>
-        </div>
-    );
-};
-
-export default SearchContainer;
+  return (
+    <form onSubmit={submit} style={{ display: 'flex', gap: 8 }}>
+      <input
+        type="text"
+        value={local}
+        onChange={(e) => setLocal(e.target.value)}
+        placeholder="Search…"
+        style={{ flex: 1, minWidth: 280, padding: '10px' }}
+      />
+      <button type="submit" disabled={!local.trim() || isSearching}>
+        {isSearching ? 'Searching…' : 'Search'}
+      </button>
+    </form>
+  );
+}
