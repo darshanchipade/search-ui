@@ -12,10 +12,8 @@ export default function Home() {
 
   useEffect(() => {
     if (activeChips.length === 0) {
-        if (searchResults.length > 0) {
-            setSearchResults([]);
-        }
-        return;
+      if (searchResults.length > 0) setSearchResults([]);
+      return;
     }
 
     const performSearch = async () => {
@@ -23,7 +21,7 @@ export default function Home() {
       setSearchResults([]);
 
       const searchRequest = {
-        query: query,
+        query,
         tags: [],
         keywords: [],
         context: {}
@@ -57,13 +55,12 @@ export default function Home() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(searchRequest)
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();
-        setSearchResults(data);
+        // ACCEPT: array OR object with {results: []}
+        const list = Array.isArray(data) ? data : (data.results || []);
+        setSearchResults(list);
       } catch (error) {
         console.error("Failed to perform search:", error);
       } finally {
@@ -84,11 +81,9 @@ export default function Home() {
 
     try {
       const response = await fetch(`/api/refine?query=${encodeURIComponent(query)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      const chipsWithState = data.map((chip, index) => ({
+      const chipsWithState = (Array.isArray(data) ? data : []).map((chip, index) => ({
         ...chip,
         id: `${chip.type}-${chip.value}-${index}`,
         isActive: false,
@@ -120,16 +115,16 @@ export default function Home() {
 
       <main className="flex justify-center items-start pt-10 bg-gray-50 min-h-screen">
         <div className="w-full max-w-4xl">
-            <ChatScreen
-              searchQuery={query}
-              setSearchQuery={setQuery}
-              handleSearch={handleInitialSearch}
-              filters={refinementChips}
-              toggleFilter={handleChipClick}
-              searchResults={searchResults}
-              isSearching={isSearching}
-            />
-            {isLoading && <p className="text-center mt-4">Loading suggestions...</p>}
+          <ChatScreen
+            searchQuery={query}
+            setSearchQuery={setQuery}
+            handleSearch={handleInitialSearch}
+            filters={refinementChips}
+            toggleFilter={handleChipClick}
+            searchResults={searchResults}
+            isSearching={isSearching}
+          />
+          {isLoading && <p className="text-center mt-4">Loading suggestions...</p>}
         </div>
       </main>
     </div>

@@ -15,12 +15,12 @@ export default function ChatScreen({
   isSearching,
 }) {
   return (
-    <div className={`bg-[#f9f9f9] box-border content-stretch flex flex-col gap-12 items-center justify-start overflow-clip px-16 pt-16 pb-4 relative rounded-[16px] size-full ${className}`}>
+    <div className={`bg-[#f9f9f9] box-border flex flex-col gap-12 items-center justify-start overflow-clip px-6 md:px-16 pt-16 pb-6 rounded-[16px] w-full ${className}`}>
       {/* Main Content */}
-      <div className="content-stretch flex flex-col gap-8 items-center justify-start relative shrink-0">
+      <div className="flex flex-col gap-8 items-center justify-start w-full">
         {/* Search Header */}
-        <div className="content-stretch flex flex-col gap-2 items-center justify-start leading-[0] not-italic relative shrink-0 text-black text-nowrap">
-          <h1 className="font-sf-pro font-medium relative shrink-0 text-[48px] tracking-[-0.768px] leading-[normal] text-nowrap whitespace-pre text-[#111215]">
+        <div className="flex flex-col gap-2 items-center">
+          <h1 className="font-sf-pro font-medium text-[32px] md:text-[48px] tracking-[-0.768px] text-[#111215] text-center">
             What are you looking for?
           </h1>
         </div>
