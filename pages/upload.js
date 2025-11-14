@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 
@@ -7,6 +7,16 @@ export default function Upload() {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [cleansedDataStoreId, setCleansedDataStoreId] = useState(null);
+  const fileInputRef = useRef(null);
+  const pollIntervalRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -47,20 +57,39 @@ export default function Upload() {
   };
 
   const pollStatus = async (id) => {
-    const interval = setInterval(async () => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+    }
+    pollIntervalRef.current = setInterval(async () => {
       try {
         const response = await fetch(`/api/cleansed-data-status/${id}`);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
-        const newStatus = await response.text();
+        const newStatusRaw = await response.text();
+        const newStatus = newStatusRaw.trim();
         setStatus(`Processing status: ${newStatus}`);
-        if (newStatus === 'ENRICHMENT_COMPLETED' || newStatus.includes('FAILED') || newStatus.includes('ERROR')) {
-          clearInterval(interval);
+        const isTerminalStatus =
+          newStatus.includes('ENRICHED') ||
+          newStatus.includes('FAILED') ||
+          newStatus.includes('ERROR') ||
+          newStatus === 'NOT_FOUND';
+
+        if (isTerminalStatus) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+          setFile(null);
+          setCleansedDataStoreId(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
         }
       } catch (error) {
         console.error('Failed to poll status:', error);
-        clearInterval(interval);
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
       }
     }, 2000);
   };
@@ -81,7 +110,12 @@ export default function Upload() {
           <div className="bg-white shadow-md rounded-lg p-8">
             <h1 className="text-2xl font-bold mb-4">Upload JSON File</h1>
             <div className="flex items-center">
-              <input type="file" onChange={handleFileChange} className="border border-gray-300 rounded-lg p-2 mr-4" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={handleFileChange}
+                  className="border border-gray-300 rounded-lg p-2 mr-4"
+                />
               <button onClick={handleUpload} disabled={isLoading} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
                 {isLoading ? 'Uploading...' : 'Upload'}
               </button>
