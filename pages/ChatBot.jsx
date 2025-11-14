@@ -48,7 +48,7 @@ export default function ChatBot() {
       const res = await fetch('/api/chatbot/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, limit: 10 })
+        body: JSON.stringify({ message: trimmed, limit: 1000 })
       });
       const data = await res.json();
 

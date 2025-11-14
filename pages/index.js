@@ -117,6 +117,7 @@ export default function Home() {
       <main className="flex justify-center items-start pt-10 bg-gray-50 min-h-screen">
         <div className="w-full max-w-4xl">
           <div className="flex justify-end mb-4">
+          <Link href="/upload" className="text-blue-600 hover:underline mr-4">Upload JSON</Link>
             <Link href="/ChatBot" className="text-blue-600 hover:underline">Open Chat</Link>
           </div>
           <ChatScreen
