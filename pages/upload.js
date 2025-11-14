@@ -69,12 +69,13 @@ export default function Upload() {
         const newStatusRaw = await response.text();
         const newStatus = newStatusRaw.trim();
         setStatus(`Processing status: ${newStatus}`);
-        if (
-          newStatus === 'ENRICHMENT_COMPLETED' ||
+        const isTerminalStatus =
+          newStatus.includes('ENRICHED') ||
           newStatus.includes('FAILED') ||
           newStatus.includes('ERROR') ||
-          newStatus === 'NOT_FOUND'
-        ) {
+          newStatus === 'NOT_FOUND';
+
+        if (isTerminalStatus) {
           clearInterval(pollIntervalRef.current);
           pollIntervalRef.current = null;
           setFile(null);
